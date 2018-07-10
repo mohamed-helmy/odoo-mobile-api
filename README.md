@@ -462,6 +462,9 @@ client.call_kw("res.partner", "create_name", arguments, new IOdooResponse() {
 
 ```
 
+**When calling ``@api.multi`` method the parameter arguments are only two. First List of record ids and second User context (json object) or you can just pass empty json object**
+See issue: https://github.com/oogbox/odoo-mobile-api/issues/8#issuecomment-403684787
+
 ## NOTE
 
 Request Error Handling
