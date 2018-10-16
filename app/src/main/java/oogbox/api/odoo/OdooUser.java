@@ -1,12 +1,15 @@
 package oogbox.api.odoo;
 
+import android.accounts.Account;
+
 import oogbox.api.odoo.client.OdooVersion;
 import oogbox.api.odoo.client.helper.data.OdooResult;
 
 public class OdooUser {
 
+    public Account account;
     public int uid, companyId, partnerId;
-    public String name, username, lang, tz, database, fcmProjectId, sessionId;
+    public String host, name, username, lang, tz, database, fcmProjectId, sessionId;
     public boolean isSuperuser;
     public OdooVersion odooVersion = new OdooVersion();
 

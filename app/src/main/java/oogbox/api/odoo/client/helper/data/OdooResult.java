@@ -10,6 +10,9 @@ public class OdooResult extends TreeMap<String, Object> {
 
     public String getString(String key) {
         if (isValidValue(key)) {
+            if (isM2O(key)) {
+                return getArray(key).get(1).toString();
+            }
             return get(key).toString();
         }
         return null;
@@ -23,17 +26,24 @@ public class OdooResult extends TreeMap<String, Object> {
     }
 
     public int getInt(String key) {
-        if (isValidValue(key)) {
+        if (isValidValue(key) && !get(key).toString().equals("false")) {
+            if (isM2O(key)) {
+                return Float.valueOf(getArray(key).get(0).toString()).intValue();
+            }
             return getFloat(key).intValue();
         }
         return -1;
     }
 
     public Float getFloat(String key) {
-        if (isValidValue(key)) {
+        if (isValidValue(key) && !get(key).toString().equals("false")) {
             return Float.valueOf(getString(key));
         }
         return 0F;
+    }
+
+    private boolean isM2O(String key) {
+        return get(key) instanceof ArrayList;
     }
 
     public OdooResult getData(String key) {

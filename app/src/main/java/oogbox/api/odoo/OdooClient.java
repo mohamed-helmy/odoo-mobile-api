@@ -16,6 +16,7 @@ public class OdooClient extends ConnectorClient<OdooClient> {
 
     public static Integer REQUEST_TIMEOUT_MS = DefaultRetryPolicy.DEFAULT_TIMEOUT_MS;
     public static Integer DEFAULT_MAX_RETRIES = DefaultRetryPolicy.DEFAULT_MAX_RETRIES;
+    public static Boolean DEBUG_RPC = false;
 
     private OdooClient(Context context) {
         super(context);
@@ -85,7 +86,9 @@ public class OdooClient extends ConnectorClient<OdooClient> {
         }
 
         public OdooClient build() {
-            client.connect();
+            if (client.odooConnectListener != null || client.sessionId == null) {
+                client.connect();
+            }
             return client;
         }
     }

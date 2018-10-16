@@ -17,6 +17,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.net.CookieHandler;
+import java.net.CookieManager;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -81,6 +83,7 @@ public abstract class ConnectorClient<T> implements Response.Listener<JSONObject
     protected ConnectorClient(Context context) {
         mContext = context;
         responseQueue = ResponseQueue.getInstanceSingleton();
+        CookieHandler.setDefault(new CookieManager());
         requestQueue = Volley.newRequestQueue(context);
     }
 
@@ -222,14 +225,31 @@ public abstract class ConnectorClient<T> implements Response.Listener<JSONObject
         try {
             call(url, params, new IOdooResponse() {
                 @Override
-                public void onResult(OdooResult result) {
+                public void onResult(final OdooResult result) {
                     if (result.get("uid") instanceof Boolean) {
                         if (callback != null) callback.onLoginFail(AuthError.AuthenticationFailed);
                     } else {
-                        OdooUser user = OdooUser.parse(result);
-                        user.odooVersion = odooVersion;
-                        if (callback != null) callback.onLoginSuccess(user);
-                        bindDetailsFromUserObject(user);
+                        getSessionInformation(new IOdooResponse() {
+                            @Override
+                            public void onResult(OdooResult session) {
+                                result.put("session_id", session.getString("session_id"));
+                                OdooUser user = OdooUser.parse(result);
+                                user.host = serverHost;
+                                user.odooVersion = odooVersion;
+                                if (callback != null) callback.onLoginSuccess(user);
+                                bindDetailsFromUserObject(user);
+                            }
+
+                            @Override
+                            public boolean onError(OdooErrorException error) {
+                                OdooUser user = OdooUser.parse(result);
+                                user.host = serverHost;
+                                user.odooVersion = odooVersion;
+                                if (callback != null) callback.onLoginSuccess(user);
+                                bindDetailsFromUserObject(user);
+                                return true;
+                            }
+                        });
                     }
                 }
 
@@ -422,6 +442,12 @@ public abstract class ConnectorClient<T> implements Response.Listener<JSONObject
     private void call(String url, JSONObject params, IOdooResponse responseCallback) throws JSONException {
         JSONObject requestData = createRequestData(params);
         final int uuid = requestData.getInt("id");
+        if (OdooClient.DEBUG_RPC) {
+            Log.v(TAG, "URL: " + url);
+            Log.v(TAG, "PAYLOAD: " + requestData);
+            Log.v(TAG, "REQUEST_ID: " + uuid);
+            Log.v(TAG, "SYNCHRONIZED: " + synchronizedRequests);
+        }
         // Registering response queue
         if (responseCallback != null) {
             responseCallback.uuid = uuid;
@@ -442,9 +468,8 @@ public abstract class ConnectorClient<T> implements Response.Listener<JSONObject
                     DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
             // Adding to queue
             requestQueue.add(objectRequest);
-
             try {
-                onResponse(requestFuture.get(OdooClient.REQUEST_TIMEOUT_MS, TimeUnit.MILLISECONDS));
+                onResponse(requestFuture.get(newRequestTimeout, TimeUnit.MILLISECONDS));
             } catch (InterruptedException | ExecutionException | TimeoutException e) {
                 if (errorListener != null) {
                     OdooErrorException error = new OdooErrorException(e.getMessage(),
@@ -486,7 +511,9 @@ public abstract class ConnectorClient<T> implements Response.Listener<JSONObject
      */
     @Override
     public void onResponse(JSONObject response) {
-
+        if (OdooClient.DEBUG_RPC) {
+            Log.v(TAG, "RESPONSE:  " + response);
+        }
         // Validating result before parsing in gson
         try {
 
@@ -536,6 +563,9 @@ public abstract class ConnectorClient<T> implements Response.Listener<JSONObject
 
     @Override
     public void onErrorResponse(VolleyError error) {
+        if (OdooClient.DEBUG_RPC) {
+            Log.e(TAG, "RESPONSE_ERROR:  " + error.getMessage(), error);
+        }
         if (errorListener == null)
             return;
         int statusCode = -404;
@@ -580,6 +610,9 @@ public abstract class ConnectorClient<T> implements Response.Listener<JSONObject
         }
         if (sessionId != null) {
             header.put("Cookie", "session_id=" + sessionId);
+        }
+        if (OdooClient.DEBUG_RPC) {
+            Log.v(TAG, "HEADERS: " + header);
         }
         return header;
     }
