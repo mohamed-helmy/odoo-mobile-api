@@ -95,7 +95,7 @@ public abstract class ConnectorClient<T> implements Response.Listener<JSONObject
             @Override
             public void onVersionLoad(final OdooVersion version) {
 
-                if (version.version_mejor < 8) {
+                if (version.version_mejor <= 8) {
                     String message = "Unsupported Odoo Version. API Supports only Odoo 8.0+";
                     Log.e(TAG, message);
                     if (errorListener != null) {
