@@ -1,7 +1,7 @@
 # Odoo Mobile API (Android)
 
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
-[ ![Download](https://api.bintray.com/packages/openongobox/api/odoo-api/images/download.svg?version=1.0.1) ](https://bintray.com/openongobox/api/odoo-api/1.0.1/link)
+[ ![Download](https://api.bintray.com/packages/openongobox/api/odoo/images/download.svg?version=1.0.4) ](https://bintray.com/openongobox/api/odoo/1.0.4/link)
 
 This project is Android Library for communicating with [Odoo](https://www.odoo.com) backend api. Main goal for this library is to provide integration support with Odoo and android native applications. 
 
@@ -10,12 +10,15 @@ This Library is built upon [Volley](https://developer.android.com/training/volle
 CHANGELOG
 =========
 
+- 1.0.4 (October 2018)
+    - Bug fixes and improvements
+    - Support for Odoo 12
+
 - 1.0.1 (January 2018)
     - Fix: Odoo 8.0 Wrong authentication crash
     - Handling of all error when authenticate request failed.
 
 - 1.0.0 (October 2017)
-
     - Basic methods for communicating with Odoo API
     - Odoo 8.0+ support
     - Request builder for fetching records from Odoo
@@ -33,7 +36,7 @@ HOW TO START
 OOG Box Odoo API as simple as you write your java code. To use in android, first add the following dependency to your app level ``build.gradle``
 
 ```gradle
-compile 'com.oogbox.api:odoo:1.0.1'
+compile 'com.oogbox.api:odoo:1.0.4'
 ```
 
 FEATURES
