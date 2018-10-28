@@ -1,7 +1,5 @@
 apply plugin: 'com.android.library'
-apply plugin: 'com.jfrog.bintray'
-apply plugin: 'digital.wup.android-maven-publish'
-
+apply plugin: 'guru.stefma.bintrayrelease'
 android {
     compileSdkVersion 28
     buildToolsVersion "28.0.3"
@@ -30,61 +28,18 @@ dependencies {
 Properties properties = new Properties()
 properties.load(project.rootProject.file('local.properties').newDataInputStream())
 
-bintray {
-    user = properties.getProperty("bintray.user")
-    key = properties.getProperty("bintray.apikey")
-
-    publications = ['OdooAPI']
-    pkg {
-        repo = 'api'
-        name = 'odoo-api'
-
-        userOrg = 'openongobox'
-        desc = 'Odoo Android API (JSON RPC) Connector library'
-
-        websiteUrl = 'http://www.oogbox.com'
-        issueTrackerUrl = 'https://github.com/oogbox/odoo-mobile-api/issues'
-        vcsUrl = 'https://github.com/oogbox/odoo-mobile-api.git'
-
-        licenses = ["AGPL-V3"]
-        publish = true
-        publicDownloadNumbers = true
-
-        version {
-            name = "1.0.4"
-            desc = "Odoo API Connector Library 1.0.4"
-        }
-    }
+version = "1.0.4"
+group = "com.oogbox.api"
+androidArtifact { // 2
+    artifactId = "odoo"
 }
-
-publishing {
-    publications {
-        OdooAPI(MavenPublication) {
-            from components.android
-            groupId 'com.oogbox.api'
-            artifactId 'odoo'
-            version '1.0.4'
-        }
-    }
-}
-
-task sourcesJar(type: Jar) {
-    from android.sourceSets.main.java.srcDirs
-    classifier = 'sources'
-}
-
-task javadoc(type: Javadoc) {
-    source = android.sourceSets.main.java.srcDirs
-    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
-    failOnError false
-}
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    from javadoc.destinationDir
-}
-
-artifacts {
-    archives javadocJar
-    archives sourcesJar
+publish {
+    userOrg = "openongobox"
+    repoName = "api"
+    desc = "Odoo API Connector Library 1.0.4"
+    website = 'https://github.com/oogbox/odoo-mobile-api'
+    licences = ["AGPL-V3"]
+    bintrayUser = properties.getProperty("bintray.user")
+    bintrayKey = properties.getProperty("bintray.apikey")
+    dryRun = false
 }
