@@ -39,7 +39,7 @@ publish {
     desc = "Odoo API Connector Library 1.0.4"
     website = 'https://github.com/oogbox/odoo-mobile-api'
     licences = ["AGPL-V3"]
-    bintrayUser = properties.getProperty("bintray.user")
-    bintrayKey = properties.getProperty("bintray.apikey")
+  //  bintrayUser = properties.getProperty("bintray.user")
+  //  bintrayKey = properties.getProperty("bintray.apikey")
     dryRun = false
 }

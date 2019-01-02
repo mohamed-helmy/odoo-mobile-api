@@ -12,7 +12,7 @@ public class OdooUser {
     public String host, name, username, lang, tz, database, fcmProjectId, sessionId;
     public boolean isSuperuser;
     public OdooVersion odooVersion = new OdooVersion();
-
+    public int BranchID;
     public static OdooUser parse(OdooResult result) {
         OdooUser user = new OdooUser();
 
@@ -37,7 +37,15 @@ public class OdooUser {
         user.tz = context.getString("tz");
         user.isSuperuser = result.getBoolean("is_superuser");
 
-        // Odoo Version
+        if (result.containsKey("branch_id")) {
+            try {
+
+
+                user.BranchID = Integer.parseInt(result.getArray("branch_id").get(0).toString().replace(".0", ""));
+            } catch (Exception e) {
+            }
+        }
+                // Odoo Version
         // Odoo 10.0+ contains only version info in user session
         if (result.containsKey("server_version_info"))
             user.odooVersion = OdooVersion.parse(result);
