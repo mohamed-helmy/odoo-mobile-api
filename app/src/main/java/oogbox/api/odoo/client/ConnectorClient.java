@@ -361,6 +361,15 @@ public abstract class ConnectorClient<T> implements Response.Listener<JSONObject
         call_kw(model, "create", arguments, callback);
     }
 
+
+    public void create(String model, List<OdooValues> values, IOdooResponse callback) {
+        OArguments arguments = new OArguments();
+        for (OdooValues odooValues:values) {
+            arguments.add(odooValues.toJSON());
+        }
+        call_kw(model, "create", arguments, callback);
+    }
+
     /**
      * Writes/Update record on server for given ids and values
      *
